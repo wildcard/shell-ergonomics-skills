@@ -1,0 +1,9 @@
+{
+  "name": "shell-ergonomics-skills",
+  "version": "1.0.0",
+  "description": "Shell ergonomics plugin: AI-powered statusline, session tracking, summaries, and developer experience tools",
+  "author": {
+    "name": "kobik-private"
+  },
+  "keywords": ["statusline", "starship", "ai-summary", "hooks", "shell", "ergonomics"]
+}

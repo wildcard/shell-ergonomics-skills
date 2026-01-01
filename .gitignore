@@ -1,0 +1,26 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Test artifacts
+tests/*.log
+tests/*.tmp
+*.bats.log
+
+# Temporary files
+*.swp
+*.swo
+*~
+
+# Cache files (these are created by the hooks at runtime)
+/tmp/claude-*
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# Backup files
+*.bak
+*.backup
