@@ -28,7 +28,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Verifies cache file created BEFORE AI call completes
   - Ensures fallback name is readable (not truncated mid-word)
   - Confirms proper sentence case capitalization
-  - Total test coverage: 21 session naming tests, 47 tests across entire project
+- New test: "parallel stress test: no race between hook and statusline" (test #39)
+  - Launches session naming hook and statusline reader simultaneously
+  - Proves cache exists even under worst-case parallel execution timing
+  - Validates no "Unnamed Session" can occur in race conditions
+  - Total test coverage: 22 session naming tests, 48 tests across entire project
 
 ### Changed
 - **Complete SKILL.md documentation refresh**

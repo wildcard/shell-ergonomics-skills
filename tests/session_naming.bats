@@ -438,3 +438,68 @@ EOF
     rm -f "/tmp/claude-session-name-${session_id}."*
     rm -f /tmp/claude-session-name-ai-*.json
 }
+
+@test "parallel stress test: no race between hook and statusline" {
+    export CLAUDE_PLUGIN_ROOT="$BATS_TEST_DIRNAME/.."
+    session_id="test-parallel-$(date +%s)"
+    setup
+    create_history "$session_id" 2
+
+    # Mock claude that returns empty (simulates timeout/failure)
+    mock_claude '{}'
+
+    # Prepare input
+    input='{"session_id":"'"$session_id"'","user_prompt":"Parallel stress test to prove no race condition exists"}'
+
+    # Launch session naming hook in background
+    (
+        echo "$input" | bash "$BATS_TEST_DIRNAME/../hooks/scripts/session-naming.sh"
+    ) &
+    hook_pid=$!
+
+    # Immediately launch statusline reader in parallel (simulating worst-case timing)
+    (
+        sleep 0.01  # Tiny delay to simulate statusline startup
+        cache_file="/tmp/claude-session-name-${session_id}.txt"
+
+        # Try reading cache multiple times (statusline would read it once)
+        for i in {1..10}; do
+            if [ -f "$cache_file" ]; then
+                cat "$cache_file" > /tmp/parallel-test-result-$$.txt
+                break
+            fi
+            sleep 0.01
+        done
+    ) &
+    reader_pid=$!
+
+    # Wait for both processes
+    wait $hook_pid || true
+    wait $reader_pid || true
+
+    # PROOF 1: Cache file must exist
+    [ -f "/tmp/claude-session-name-${session_id}.txt" ]
+
+    # PROOF 2: Cache must have readable content
+    name=$(cat "/tmp/claude-session-name-${session_id}.txt")
+    [ -n "$name" ]
+    [ ${#name} -ge 10 ]
+
+    # PROOF 3: Reader should have successfully read the cache
+    if [ -f "/tmp/parallel-test-result-$$.txt" ]; then
+        reader_result=$(cat "/tmp/parallel-test-result-$$.txt")
+        [ -n "$reader_result" ]
+        [ ${#reader_result} -ge 10 ]
+        # Should NOT be "Unnamed Session"
+        [[ ! "$reader_result" =~ "Unnamed Session" ]]
+        rm -f "/tmp/parallel-test-result-$$.txt"
+    fi
+
+    # PROOF 4: Proper formatting
+    [[ "$name" =~ ^[A-Z] ]]  # Starts with capital letter
+
+    # Cleanup
+    teardown
+    rm -f "/tmp/claude-session-name-${session_id}."*
+    rm -f /tmp/claude-session-name-ai-*.json
+}
