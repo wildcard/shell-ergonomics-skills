@@ -14,35 +14,40 @@ A Claude Code plugin focused on shell ergonomics: AI-powered statusline enhancem
 
 ## Installation
 
-### Development (Local)
-
-1. Clone or symlink to Claude plugins directory:
-   ```bash
-   ln -s ~/workspace/shell-ergonomics-skills ~/.claude/plugins/cache/shell-ergonomics-skills
-   ```
-
-2. Update `~/.claude/settings.json`:
-   ```json
-   {
-     "statusLine": {
-       "type": "command",
-       "command": "bash ~/.claude/plugins/cache/shell-ergonomics-skills/skills/advanced-statusline/scripts/statusline-wrapper.sh"
-     }
-   }
-   ```
-
-3. Remove old hook configurations from `settings.json` (the plugin's `hooks.json` handles this now)
-
-4. Restart Claude Code
-
-### From Repository
+### From Plugin Marketplace (Recommended)
 
 ```bash
-# Install to plugins cache
-git clone <repo-url> ~/.claude/plugins/cache/shell-ergonomics-skills
-
-# Follow steps 2-4 from development installation above
+/plugin install shell-ergonomics-skills@wildcard
 ```
+
+### Development Installation
+
+```bash
+# Clone the repository
+git clone git@github.com:wildcard/shell-ergonomics-skills.git
+
+# Run Claude Code with the plugin loaded
+claude --plugin-dir ./shell-ergonomics-skills
+```
+
+### Statusline Configuration
+
+After installation, add to `~/.claude/settings.json`:
+
+```json
+{
+  "statusLine": {
+    "type": "command",
+    "command": "bash ${CLAUDE_PLUGIN_ROOT}/skills/advanced-statusline/scripts/statusline-wrapper.sh"
+  }
+}
+```
+
+**Note:** Replace `${CLAUDE_PLUGIN_ROOT}` with the actual plugin path:
+- **Marketplace install:** `~/.claude/plugins/cache/shell-ergonomics-skills`
+- **Development:** Your local clone path (e.g., `~/workspace/shell-ergonomics-skills`)
+
+Then restart Claude Code.
 
 ## Requirements
 
@@ -93,7 +98,7 @@ Uses Claude Haiku with structured output for:
 See [tests/README.md](tests/README.md) for the test suite using bats-core.
 
 ```bash
-cd ~/workspace/shell-ergonomics-skills
+# From the plugin directory
 bats tests/*.bats
 ```
 
