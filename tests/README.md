@@ -34,6 +34,54 @@ bats tests/statusline_wrapper.bats
 bats --tap tests/*.bats
 ```
 
+## Docker Integration Tests
+
+Test plugin installation in a fresh Claude Code environment using Docker.
+
+### Quick Start
+
+```bash
+# Using docker-compose (recommended)
+docker compose -f tests/docker/docker-compose.yml up --build
+
+# Or using docker directly
+docker build -f tests/docker/Dockerfile -t plugin-test .
+docker run --rm plugin-test
+```
+
+### What It Tests
+
+The Docker integration test verifies:
+- ✅ Plugin structure (`plugin.json` validity)
+- ✅ Hooks configuration (`hooks.json` valid JSON)
+- ✅ Script executability (all `.sh` files in `hooks/scripts/`)
+- ✅ Skill structure (`SKILL.md` has required frontmatter)
+- ✅ Statusline script exists and is executable
+- ✅ Claude Code CLI can load the plugin
+- ✅ Dependencies (jq, starship) are available
+- ✅ **Statusline execution** (simulates session, verifies 3-line output format)
+
+### Requirements
+
+- Docker or Docker Desktop
+- No other dependencies needed (container has everything)
+
+### Test Output
+
+See [tests/docker/README.md](docker/README.md) for full output example including statusline execution test.
+
+### CI/CD Integration
+
+Add to GitHub Actions:
+```yaml
+docker-test:
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v3
+    - name: Run Docker integration test
+      run: docker compose -f tests/docker/docker-compose.yml up --build --exit-code-from plugin-test
+```
+
 ## Test Coverage
 
 ### `session_naming.bats`

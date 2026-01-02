@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  plugin-test:
+    build:
+      context: ../..
+      dockerfile: tests/docker/Dockerfile
+    image: shell-ergonomics-skills:test
+    container_name: plugin-installation-test
+    # No need for volumes or environment variables for basic structure tests
+    # API key would only be needed for actual Claude Code execution
