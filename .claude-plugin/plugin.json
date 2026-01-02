@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "description": "Shell ergonomics plugin: AI-powered statusline, session tracking, summaries, and developer experience tools",
   "author": {
-    "name": "kobik-private"
+    "name": "wildcard"
   },
+  "homepage": "https://github.com/wildcard/shell-ergonomics-skills",
+  "repository": "https://github.com/wildcard/shell-ergonomics-skills",
+  "license": "MIT",
   "keywords": ["statusline", "starship", "ai-summary", "hooks", "shell", "ergonomics"]
 }
