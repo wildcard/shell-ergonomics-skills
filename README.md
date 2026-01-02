@@ -18,9 +18,32 @@ A Claude Code plugin focused on shell ergonomics: AI-powered statusline enhancem
 
 ### From Plugin Marketplace (Recommended)
 
+#### Step 1: Add the Marketplace
+
+```bash
+/plugin marketplace add wildcard/claude-marketplace
+```
+
+#### Step 2: Install the Plugin
+
 ```bash
 /plugin install shell-ergonomics-skills@wildcard
 ```
+
+#### Step 3: Configure Statusline
+
+Add to `~/.claude/settings.json`:
+
+```json
+{
+  "statusLine": {
+    "type": "command",
+    "command": "bash ~/.claude/plugins/cache/shell-ergonomics-skills/skills/advanced-statusline/scripts/statusline-wrapper.sh"
+  }
+}
+```
+
+Then restart Claude Code.
 
 ### Development Installation
 
@@ -32,24 +55,18 @@ git clone git@github.com:wildcard/shell-ergonomics-skills.git
 claude --plugin-dir ./shell-ergonomics-skills
 ```
 
-### Statusline Configuration
-
-After installation, add to `~/.claude/settings.json`:
+For development, configure statusline in `~/.claude/settings.json`:
 
 ```json
 {
   "statusLine": {
     "type": "command",
-    "command": "bash ${CLAUDE_PLUGIN_ROOT}/skills/advanced-statusline/scripts/statusline-wrapper.sh"
+    "command": "bash /path/to/your/clone/shell-ergonomics-skills/skills/advanced-statusline/scripts/statusline-wrapper.sh"
   }
 }
 ```
 
-**Note:** Replace `${CLAUDE_PLUGIN_ROOT}` with the actual plugin path:
-- **Marketplace install:** `~/.claude/plugins/cache/shell-ergonomics-skills`
-- **Development:** Your local clone path (e.g., `~/workspace/shell-ergonomics-skills`)
-
-Then restart Claude Code.
+Replace `/path/to/your/clone` with your actual clone path, then restart Claude Code.
 
 ## Requirements
 
