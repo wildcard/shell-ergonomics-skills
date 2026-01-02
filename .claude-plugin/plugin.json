@@ -1,6 +1,6 @@
 {
   "name": "shell-ergonomics-skills",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Shell ergonomics plugin: AI-powered statusline, session tracking, summaries, and developer experience tools",
   "author": {
     "name": "wildcard"
