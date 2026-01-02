@@ -35,7 +35,9 @@ history_file="$HOME/.claude/history.jsonl"
 current_msg_count=0
 if [ -f "$history_file" ]; then
     current_msg_count=$(grep -c "\"sessionId\":\"${session_id}\"" "$history_file" 2>/dev/null || echo "0")
+    current_msg_count=$(echo "$current_msg_count" | tr -d '\n\r ')
 fi
+current_msg_count=${current_msg_count:-0}
 
 if [ ! -f "$cache_file" ]; then
     # No cache exists, generate new name
@@ -47,7 +49,8 @@ else
         should_regenerate=true
     else
         # Check if new messages exist since last generation
-        last_msg_count=$(cat "$msg_count_file" 2>/dev/null || echo "0")
+        last_msg_count=$(cat "$msg_count_file" 2>/dev/null | tr -d '\n\r ' || echo "0")
+        last_msg_count=${last_msg_count:-0}
         if [ "$current_msg_count" -gt "$last_msg_count" ]; then
             should_regenerate=true
         fi
@@ -78,19 +81,44 @@ for i in {1..5}; do
     sleep 1
 done
 
-kill $claude_pid >/dev/null 2>&1
-wait $claude_pid >/dev/null 2>&1
+kill $claude_pid >/dev/null 2>&1 || true
+wait $claude_pid >/dev/null 2>&1 || true
 
 # Extract name
 session_name=""
 if [ -f "$ai_temp" ] && [ -s "$ai_temp" ]; then
-    session_name=$(jq -r '.structured_output.name // empty' "$ai_temp" 2>/dev/null)
+    session_name=$(jq -r '.structured_output.name // empty' "$ai_temp" 2>/dev/null || echo "")
     rm -f "$ai_temp"
 fi
 
-# Fallback: use first 40 chars of prompt
+# Fallback: create readable name from prompt
 if [ -z "$session_name" ] || [ ${#session_name} -lt 5 ]; then
-    session_name=$(echo "$user_prompt" | head -c 40 | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+    # Take complete words until we exceed 37 chars (leave room for "...")
+    session_name=""
+    for word in $user_prompt; do
+        if [ -z "$session_name" ]; then
+            # First word - capitalize it
+            session_name="$(echo "${word:0:1}" | tr '[:lower:]' '[:upper:]')${word:1}"
+        else
+            # Check if adding this word would exceed limit
+            test_name="$session_name $word"
+            if [ ${#test_name} -le 37 ]; then
+                session_name="$test_name"
+            else
+                # Would exceed limit, add ellipsis and break
+                session_name="${session_name}..."
+                break
+            fi
+        fi
+    done
+
+    # If we got through all words without truncating, don't add ellipsis
+    if [[ ! "$session_name" =~ \.\.\.$ ]]; then
+        # Ensure it's not too long anyway
+        if [ ${#session_name} -gt 40 ]; then
+            session_name="${session_name:0:37}..."
+        fi
+    fi
 fi
 
 # Cache the name, timestamp, and message count

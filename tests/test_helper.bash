@@ -83,3 +83,10 @@ create_hook_input() {
 }
 EOF
 }
+
+# Skip test if no API key
+skip_if_no_api_key() {
+    if [ -z "$ANTHROPIC_API_KEY" ]; then
+        skip "ANTHROPIC_API_KEY not set"
+    fi
+}
