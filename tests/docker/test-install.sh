@@ -76,12 +76,12 @@ if [ -d "$SCRIPT_DIR" ]; then
 
     for script in "$SCRIPT_DIR"/*.sh; do
         if [ -f "$script" ]; then
-            ((SCRIPT_COUNT++))
+            SCRIPT_COUNT=$((SCRIPT_COUNT + 1))
             if [ -x "$script" ]; then
                 pass "$(basename "$script") is executable"
             else
                 fail "$(basename "$script") is not executable"
-                ((NON_EXECUTABLE++))
+                NON_EXECUTABLE=$((NON_EXECUTABLE + 1))
             fi
         fi
     done
