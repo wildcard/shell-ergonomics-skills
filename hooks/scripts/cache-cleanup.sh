@@ -23,7 +23,8 @@ find /tmp -name "claude-session-plan-*.txt" -mtime +7 -delete 2>/dev/null
 find /tmp -name "claude-assistant-actions-*.jsonl" -mtime +7 -delete 2>/dev/null
 find /tmp -name "claude-assistant-summary-*.txt" -mtime +7 -delete 2>/dev/null
 
-# Also cleanup temporary AI summary files (always clean these up if > 1 hour old)
+# Also cleanup temporary AI files (always clean these up if > 1 hour old)
 find /tmp -name "claude-ai-summary-*.json" -mmin +60 -delete 2>/dev/null
+find /tmp -name "claude-session-name-ai-*.json" -mmin +60 -delete 2>/dev/null
 
 exit 0
