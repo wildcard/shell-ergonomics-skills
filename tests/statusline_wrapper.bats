@@ -12,7 +12,7 @@ load test_helper
 
     input=$(create_statusline_input "$session_id" "/Users/test/caro")
 
-    output=$(echo "$input" | bash "$BATS_TEST_DIRNAME/../skills/advanced-statusline/scripts/statusline-wrapper.sh)
+    output=$(echo "$input" | bash "$BATS_TEST_DIRNAME/../skills/advanced-statusline/scripts/statusline-wrapper.sh")
     line_count=$(echo "$output" | wc -l)
 
     [ "$line_count" -eq 3 ]
@@ -30,7 +30,7 @@ load test_helper
 
     input=$(create_statusline_input "$session_id")
 
-    output=$(echo "$input" | bash "$BATS_TEST_DIRNAME/../skills/advanced-statusline/scripts/statusline-wrapper.sh)
+    output=$(echo "$input" | bash "$BATS_TEST_DIRNAME/../skills/advanced-statusline/scripts/statusline-wrapper.sh")
     line1=$(echo "$output" | head -1)
 
     [[ "$line1" =~ "Claude 3.5 Sonnet" ]]
@@ -48,7 +48,7 @@ load test_helper
 
     input=$(create_statusline_input "$session_id")
 
-    output=$(echo "$input" | bash "$BATS_TEST_DIRNAME/../skills/advanced-statusline/scripts/statusline-wrapper.sh)
+    output=$(echo "$input" | bash "$BATS_TEST_DIRNAME/../skills/advanced-statusline/scripts/statusline-wrapper.sh")
     line1=$(echo "$output" | head -1)
 
     # 50000 + 5000 = 55000 out of 200000 = 27%
@@ -67,7 +67,7 @@ load test_helper
 
     input=$(create_statusline_input "$session_id")
 
-    output=$(echo "$input" | bash "$BATS_TEST_DIRNAME/../skills/advanced-statusline/scripts/statusline-wrapper.sh)
+    output=$(echo "$input" | bash "$BATS_TEST_DIRNAME/../skills/advanced-statusline/scripts/statusline-wrapper.sh")
     line2=$(echo "$output" | sed -n '2p')
 
     [[ "$line2" =~ "$session_id" ]]
@@ -85,7 +85,7 @@ load test_helper
 
     input=$(create_statusline_input "$session_id" "/Users/test/caro")
 
-    output=$(echo "$input" | bash "$BATS_TEST_DIRNAME/../skills/advanced-statusline/scripts/statusline-wrapper.sh)
+    output=$(echo "$input" | bash "$BATS_TEST_DIRNAME/../skills/advanced-statusline/scripts/statusline-wrapper.sh")
     line1=$(echo "$output" | head -1)
 
     [[ "$line1" =~ "🦀" ]]
@@ -103,7 +103,7 @@ load test_helper
 
     input=$(create_statusline_input "$session_id" "/Users/test/my-node-app")
 
-    output=$(echo "$input" | bash "$BATS_TEST_DIRNAME/../skills/advanced-statusline/scripts/statusline-wrapper.sh)
+    output=$(echo "$input" | bash "$BATS_TEST_DIRNAME/../skills/advanced-statusline/scripts/statusline-wrapper.sh")
     line1=$(echo "$output" | head -1)
 
     [[ "$line1" =~ "📦" ]]
@@ -125,7 +125,7 @@ load test_helper
 
     input=$(create_statusline_input "$session_id")
 
-    output=$(echo "$input" | bash "$BATS_TEST_DIRNAME/../skills/advanced-statusline/scripts/statusline-wrapper.sh)
+    output=$(echo "$input" | bash "$BATS_TEST_DIRNAME/../skills/advanced-statusline/scripts/statusline-wrapper.sh")
     line2=$(echo "$output" | sed -n '2p')
 
     [[ "$line2" =~ "Cached summary text" ]]
@@ -149,7 +149,7 @@ load test_helper
 
     input=$(create_statusline_input "$session_id")
 
-    output=$(echo "$input" | bash "$BATS_TEST_DIRNAME/../skills/advanced-statusline/scripts/statusline-wrapper.sh)
+    output=$(echo "$input" | bash "$BATS_TEST_DIRNAME/../skills/advanced-statusline/scripts/statusline-wrapper.sh")
     line2=$(echo "$output" | sed -n '2p')
 
     # Should regenerate with new summary
@@ -171,7 +171,7 @@ load test_helper
 
     input=$(create_statusline_input "$session_id")
 
-    output=$(echo "$input" | bash "$BATS_TEST_DIRNAME/../skills/advanced-statusline/scripts/statusline-wrapper.sh)
+    output=$(echo "$input" | bash "$BATS_TEST_DIRNAME/../skills/advanced-statusline/scripts/statusline-wrapper.sh")
     line2=$(echo "$output" | sed -n '2p')
 
     [[ "$line2" =~ "Active session" ]]

@@ -138,7 +138,9 @@ if [ "$should_regenerate" = true ]; then
         # Process line-by-line to avoid jq -s parse errors
         first_user_msg=$(grep "\"sessionId\":\"${session_id}\"" "$history_file" | head -1 | jq -r '.display // ""')
         recent_user_msgs=$(grep "\"sessionId\":\"${session_id}\"" "$history_file" | tail -7 | jq -r '.display' | paste -sd ' ' -)
-        user_msg_count=$(grep -c "\"sessionId\":\"${session_id}\"" "$history_file")
+        user_msg_count=$(grep -c "\"sessionId\":\"${session_id}\"" "$history_file" 2>/dev/null || echo "0")
+        user_msg_count=$(echo "$user_msg_count" | tr -d '\n\r ')
+        user_msg_count=${user_msg_count:-0}
     else
         # No history file available
         first_user_msg=""
