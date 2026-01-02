@@ -115,13 +115,16 @@ history_file="$HOME/.claude/history.jsonl"
 current_msg_count=0
 if [ -f "$history_file" ]; then
     current_msg_count=$(grep -c "\"sessionId\":\"${session_id}\"" "$history_file" 2>/dev/null || echo "0")
+    current_msg_count=$(echo "$current_msg_count" | tr -d '\n\r ')
 fi
+current_msg_count=${current_msg_count:-0}
 
 if [ ! -f "$summary_cache" ]; then
     should_regenerate=true
 else
     # Check if new messages exist
-    last_msg_count=$(cat "$summary_msg_count" 2>/dev/null || echo "0")
+    last_msg_count=$(cat "$summary_msg_count" 2>/dev/null | tr -d '\n\r ' || echo "0")
+    last_msg_count=${last_msg_count:-0}
     if [ "$current_msg_count" -gt "$last_msg_count" ]; then
         should_regenerate=true
     fi
