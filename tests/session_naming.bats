@@ -399,10 +399,39 @@ EOF
     bash "$BATS_TEST_DIRNAME/../hooks/scripts/session-naming.sh" <<< "$input"
 
     name=$(cat "/tmp/claude-session-name-${session_id}.txt")
-    
+
     # Should create something like "Add user authentication..." not "add user authentication and authorizat"
     # First char should be uppercase if it's a sentence
     [[ "$name" =~ ^[A-Z] ]] || [[ "$name" =~ ^[a-z]{2,4}\ [a-z] ]]  # Either starts with capital or lowercase article/verb
+
+    # Cleanup
+    teardown
+    rm -f "/tmp/claude-session-name-${session_id}."*
+    rm -f /tmp/claude-session-name-ai-*.json
+}
+
+@test "cache exists immediately even when AI times out" {
+    export CLAUDE_PLUGIN_ROOT="$BATS_TEST_DIRNAME/.."
+    session_id="test-immediate-$(date +%s)"
+    setup
+    create_history "$session_id" 1
+
+    # Mock claude that returns empty (simulates timeout/failure)
+    mock_claude '{}'
+
+    input='{"session_id":"'"$session_id"'","user_prompt":"Investigate why session naming is not working properly"}'
+    bash "$BATS_TEST_DIRNAME/../hooks/scripts/session-naming.sh" <<< "$input"
+
+    # Cache file MUST exist immediately
+    [ -f "/tmp/claude-session-name-${session_id}.txt" ]
+
+    # Cache MUST have a readable fallback name (not empty, not "Unnamed Session")
+    name=$(cat "/tmp/claude-session-name-${session_id}.txt")
+    [ -n "$name" ]
+    [ ${#name} -ge 10 ]
+
+    # Should be a proper fallback like "Investigate why session naming..."
+    [[ "$name" =~ ^[A-Z] ]]  # Starts with capital letter
 
     # Cleanup
     teardown

@@ -62,6 +62,40 @@ if [ "$should_regenerate" = false ]; then
     exit 0
 fi
 
+# IMMEDIATELY write a fallback name to prevent "Unnamed Session" race condition
+# This ensures cache file exists even if AI call times out or fails
+# The AI call below will overwrite this with a better name if successful
+fallback_name=""
+for word in $user_prompt; do
+    if [ -z "$fallback_name" ]; then
+        # First word - capitalize it
+        fallback_name="$(echo "${word:0:1}" | tr '[:lower:]' '[:upper:]')${word:1}"
+    else
+        # Check if adding this word would exceed limit
+        test_name="$fallback_name $word"
+        if [ ${#test_name} -le 37 ]; then
+            fallback_name="$test_name"
+        else
+            # Would exceed limit, add ellipsis and break
+            fallback_name="${fallback_name}..."
+            break
+        fi
+    fi
+done
+
+# If we got through all words without truncating, don't add ellipsis
+if [[ ! "$fallback_name" =~ \.\.\.$ ]]; then
+    # Ensure it's not too long anyway
+    if [ ${#fallback_name} -gt 40 ]; then
+        fallback_name="${fallback_name:0:37}..."
+    fi
+fi
+
+# Write the fallback name immediately to cache
+echo "$fallback_name" > "$cache_file"
+date +%s > "$timestamp_file"
+echo "$current_msg_count" > "$msg_count_file"
+
 # Generate session name using AI (with timeout)
 schema='{"type":"object","properties":{"name":{"type":"string","maxLength":40}},"required":["name"]}'
 prompt="Generate a concise session name (3-5 words, max 40 chars) for this task: ${user_prompt}"
@@ -84,47 +118,20 @@ done
 kill $claude_pid >/dev/null 2>&1 || true
 wait $claude_pid >/dev/null 2>&1 || true
 
-# Extract name
-session_name=""
+# Extract name from AI response
+ai_session_name=""
 if [ -f "$ai_temp" ] && [ -s "$ai_temp" ]; then
-    session_name=$(jq -r '.structured_output.name // empty' "$ai_temp" 2>/dev/null || echo "")
+    ai_session_name=$(jq -r '.structured_output.name // empty' "$ai_temp" 2>/dev/null || echo "")
     rm -f "$ai_temp"
 fi
 
-# Fallback: create readable name from prompt
-if [ -z "$session_name" ] || [ ${#session_name} -lt 5 ]; then
-    # Take complete words until we exceed 37 chars (leave room for "...")
-    session_name=""
-    for word in $user_prompt; do
-        if [ -z "$session_name" ]; then
-            # First word - capitalize it
-            session_name="$(echo "${word:0:1}" | tr '[:lower:]' '[:upper:]')${word:1}"
-        else
-            # Check if adding this word would exceed limit
-            test_name="$session_name $word"
-            if [ ${#test_name} -le 37 ]; then
-                session_name="$test_name"
-            else
-                # Would exceed limit, add ellipsis and break
-                session_name="${session_name}..."
-                break
-            fi
-        fi
-    done
-
-    # If we got through all words without truncating, don't add ellipsis
-    if [[ ! "$session_name" =~ \.\.\.$ ]]; then
-        # Ensure it's not too long anyway
-        if [ ${#session_name} -gt 40 ]; then
-            session_name="${session_name:0:37}..."
-        fi
-    fi
+# If AI succeeded with a valid name, overwrite the fallback cache
+if [ -n "$ai_session_name" ] && [ ${#ai_session_name} -ge 5 ]; then
+    echo "$ai_session_name" > "$cache_file"
+    date +%s > "$timestamp_file"
+    echo "$current_msg_count" > "$msg_count_file"
 fi
-
-# Cache the name, timestamp, and message count
-echo "$session_name" > "$cache_file"
-date +%s > "$timestamp_file"
-echo "$current_msg_count" > "$msg_count_file"
+# Otherwise, keep the immediate fallback that was already written
 
 # Occasionally run shared cleanup (1% of the time to minimize overhead)
 if [ $((RANDOM % 100)) -eq 0 ]; then
