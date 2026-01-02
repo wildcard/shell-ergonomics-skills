@@ -1,5 +1,7 @@
 # Shell Ergonomics Skills
 
+[![Docker Integration Tests](https://github.com/wildcard/shell-ergonomics-skills/actions/workflows/test.yml/badge.svg)](https://github.com/wildcard/shell-ergonomics-skills/actions/workflows/test.yml)
+
 A Claude Code plugin focused on shell ergonomics: AI-powered statusline enhancements, session tracking, intelligent summaries, and developer experience improvements.
 
 ## Features
