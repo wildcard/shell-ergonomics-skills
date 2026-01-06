@@ -1,0 +1,11 @@
+{
+  "name": "shell-ergonomics-marketplace",
+  "description": "Shell ergonomics plugins for Claude Code",
+  "plugins": [
+    {
+      "name": "shell-ergonomics-skills",
+      "description": "AI-powered statusline, session naming, and developer experience tools",
+      "path": "."
+    }
+  ]
+}

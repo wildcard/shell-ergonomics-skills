@@ -21,7 +21,7 @@ A Claude Code plugin focused on shell ergonomics: AI-powered statusline enhancem
 #### Step 1: Add the Marketplace
 
 ```bash
-/plugin marketplace add wildcard/claude-marketplace
+/plugin marketplace add wildcard/shell-ergonomics-skills
 ```
 
 #### Step 2: Install the Plugin
